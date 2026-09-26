@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deciding better: a field guide to mental models that hold up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f0f3f1;
+    --surface: #fbfcfb;
+    --ink: #13212b;
+    --muted: #55656f;
+    --line: #cbd6d6;
+    --teal: #0d6a70;
+    --marker: #ffe27a;
+    --marker-edge: #d9b400;
+    --sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0e171d;
+      --surface: #142029;
+      --ink: #e4ecef;
+      --muted: #93a3ac;
+      --line: #263540;
+      --teal: #5ec5cb;
+      --marker: #3d3410;
+      --marker-edge: #e8c53a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0e171d;
+    --surface: #142029;
+    --ink: #e4ecef;
+    --muted: #93a3ac;
+    --line: #263540;
+    --teal: #5ec5cb;
+    --marker: #3d3410;
+    --marker-edge: #e8c53a;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+  @media (min-width: 980px) { html { scroll-padding-top: 32px; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 18px; line-height: 1.65; -webkit-text-size-adjust: 100%; }
+  a { color: var(--teal); text-underline-offset: 3px; }
+  :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 2px; }
+  h1, h2, h3, h4 { font-family: var(--sans); line-height: 1.12; margin: 0; letter-spacing: -0.015em; }
+  p { margin: 0 0 14px; }
+  .muted { color: var(--muted); }
+  button { font-family: var(--sans); font-size: 0.95rem; cursor: pointer; }
+
+  /* layout */
+  .layout { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+  @media (min-width: 980px) { .layout { display: grid; grid-template-columns: 188px minmax(0, 1fr); gap: 56px; padding: 0 32px; } }
+
+  /* navigation: top bar on small screens, side rail on large */
+  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--paper); border-bottom: 1px solid var(--line); margin: 0 -20px; padding: 0 20px; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc .brand { display: none; }
+  .toc a, .toc button.themebtn { font-family: var(--sans); font-size: 0.92rem; color: var(--muted); text-decoration: none; padding: 14px 10px; white-space: nowrap; background: none; border: 0; }
+  .toc a[aria-current="true"] { color: var(--ink); box-shadow: inset 0 -3px 0 var(--marker-edge); }
+  @media (min-width: 980px) {
+    .toc { top: calc(env(safe-area-inset-top, 0px) + 32px); flex-direction: column; gap: 0; border: 0; margin: 0; padding: 32px 0 0; align-self: start; overflow: visible; background: none; }
+    .toc .brand { display: block; font-family: var(--sans); font-weight: 700; font-size: 1.15rem; line-height: 1.15; margin-bottom: 18px; }
+    .toc a, .toc button.themebtn { padding: 7px 0 7px 12px; border-left: 3px solid var(--line); text-align: left; }
+    .toc a[aria-current="true"] { box-shadow: none; border-left-color: var(--marker-edge); }
+    .toc button.themebtn { margin-top: 18px; border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; }
+  }
+
+  main { padding: 36px 0 80px; min-width: 0; }
+  section { margin-top: 84px; }
+  section > h2 { font-size: clamp(1.8rem, 4.4vw, 2.5rem); margin-bottom: 12px; }
+  section > .intro { max-width: 36em; color: var(--muted); font-size: 1.08rem; }
+
+  /* hero */
+  .hero h1 { font-weight: 700; font-size: clamp(2.6rem, 8vw, 5rem); line-height: 0.98; letter-spacing: -0.035em; margin-bottom: 22px; }
+  .hero .lede { font-size: 1.28rem; max-width: 30em; margin-bottom: 22px; }
+  .note { border-left: 4px solid var(--line); padding: 2px 0 2px 16px; color: var(--muted); max-width: 40em; font-size: 1rem; }
+  .note strong { color: var(--ink); }
+
+  /* evidence meter */
+  .meter { display: inline-flex; gap: 3px; vertical-align: middle; }
+  .meter i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--teal); display: block; }
+  .meter i.on { background: var(--teal); }
+  .legend { display: grid; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; font-size: 0.98rem; max-width: 40em; }
+  .legend li { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: baseline; }
+  .legend .lab { font-family: var(--sans); font-weight: 500; white-space: nowrap; }
+  .legend .lab .meter { margin-right: 8px; }
+
+  /* sizer */
+  .sizer { margin-top: 34px; border: 2px solid var(--ink); border-radius: 6px; background: var(--surface); padding: 22px; }
+  .sizer h2 { font-size: 1.5rem; margin-bottom: 4px; }
+  .sizer .q { margin-top: 18px; }
+  .sizer .q p { font-family: var(--sans); font-weight: 500; margin-bottom: 8px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 8px; }
+  .seg button { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 4px; padding: 9px 16px; min-height: 44px; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .sizer-out { margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--line); }
+  .sizer-out h3 { font-size: 1.35rem; margin-bottom: 6px; }
+  .sizer-out .time { font-family: var(--sans); font-weight: 500; }
+  .reach { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 10px 0 12px; padding: 0; list-style: none; font-family: var(--sans); }
+
+  /* model list */
+  .filters { margin: 26px 0 8px; }
+  .group { margin-top: 44px; }
+  .group > h3 { font-size: 1.5rem; }
+  .group > p { color: var(--muted); max-width: 38em; margin-top: 6px; }
+  .model { display: grid; gap: 10px 32px; padding: 26px 0; border-top: 1px solid var(--line); }
+  .model:last-child { border-bottom: 1px solid var(--line); }
+  @media (min-width: 760px) { .model { grid-template-columns: 200px minmax(0, 1fr); } }
+  .model h4 { font-size: 1.2rem; margin-bottom: 8px; }
+  .ev { font-family: var(--sans); font-size: 0.88rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .model .body p { margin-bottom: 12px; }
+  .model .research { color: var(--muted); font-size: 0.98rem; }
+  .lbl { font-family: var(--sans); font-weight: 700; font-size: 0.92rem; color: var(--ink); margin-right: 4px; }
+  .model .act { background: var(--marker); border-left: 4px solid var(--marker-edge); padding: 10px 14px; border-radius: 0 4px 4px 0; margin-bottom: 0; }
+  .flash { animation: flash 1.8s ease-out; }
+  @keyframes flash { 0%, 35% { background: var(--marker); } 100% { background: transparent; } }
+
+  /* biases */
+  .tablewrap { overflow-x: auto; margin-top: 22px; }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.98rem; }
+  th { font-family: var(--sans); font-weight: 700; text-align: left; padding: 10px 14px 10px 0; border-bottom: 2px solid var(--ink); }
+  td { padding: 12px 14px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { font-family: var(--sans); font-weight: 500; white-space: nowrap; }
+
+  /* protocol */
+  .steps { list-style: none; counter-reset: step; padding: 0; margin: 28px 0 0; }
+  .steps > li { counter-increment: step; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 12px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .steps > li::before { content: counter(step); font-family: var(--sans); font-weight: 700; font-size: 2.4rem; line-height: 1; color: var(--teal); grid-row: span 3; }
+  .steps h3 { font-size: 1.2rem; }
+  .steps .time { font-family: var(--sans); font-size: 0.88rem; color: var(--muted); }
+  .steps p { margin: 4px 0 6px; }
+  .uses { font-family: var(--sans); font-size: 0.92rem; }
+  .uses a { margin-right: 12px; }
+  .pocket { margin-top: 34px; border: 2px solid var(--ink); border-radius: 6px; background: var(--surface); padding: 20px 22px; max-width: 40em; }
+  .pocket h3 { font-size: 1.25rem; margin-bottom: 10px; }
+  .pocket ol { margin: 0; padding-left: 22px; }
+  .pocket li { margin-bottom: 6px; }
+  details { border-top: 1px solid var(--line); padding: 14px 0; }
+  details:last-of-type { border-bottom: 1px solid var(--line); }
+  summary { font-family: var(--sans); font-weight: 500; font-size: 1.05rem; cursor: pointer; }
+  details ol, details ul { margin: 12px 0 0; padding-left: 22px; }
+  details li { margin-bottom: 6px; }
+  .scripts { margin-top: 30px; }
+
+  /* journal */
+  .jform { margin-top: 26px; display: grid; gap: 16px; max-width: 40em; }
+  .jform label { font-family: var(--sans); font-weight: 500; display: block; margin-bottom: 4px; }
+  .jform .hint { font-family: var(--serif); font-weight: 400; color: var(--muted); font-size: 0.92rem; }
+  input[type="text"], input[type="date"], textarea, select { width: 100%; font: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 4px; padding: 10px 12px; }
+  textarea { resize: vertical; min-height: 64px; }
+  input[type="range"] { width: 100%; accent-color: var(--teal); }
+  .row2 { display: grid; gap: 16px; }
+  @media (min-width: 620px) { .row2 { grid-template-columns: 1fr 1fr; } }
+  .btn { background: var(--ink); color: var(--paper); border: 0; border-radius: 4px; padding: 11px 20px; min-height: 44px; font-weight: 500; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+  .btn.small { padding: 7px 14px; min-height: 36px; font-size: 0.88rem; }
+  .msg { min-height: 1.4em; color: var(--muted); font-size: 0.98rem; }
+  .calib { margin-top: 34px; border: 2px solid var(--ink); border-radius: 6px; background: var(--surface); padding: 18px 22px; max-width: 40em; }
+  .calib h3 { font-size: 1.2rem; margin-bottom: 6px; }
+  .calib .nums { display: flex; flex-wrap: wrap; gap: 6px 28px; font-family: var(--sans); margin: 8px 0; }
+  .calib .nums b { font-size: 1.6rem; display: block; line-height: 1.1; }
+  .entries { margin-top: 26px; }
+  .entry { padding: 20px 0; border-top: 1px solid var(--line); }
+  .entry:last-child { border-bottom: 1px solid var(--line); }
+  .entry-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+  .entry h4 { font-size: 1.1rem; }
+  .status { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); }
+  .status.due { background: var(--marker); border: 1px solid var(--marker-edge); color: var(--ink); padding: 1px 8px; border-radius: 3px; }
+  .entry dl { margin: 10px 0 0; display: grid; gap: 4px 14px; font-size: 0.98rem; }
+  @media (min-width: 620px) { .entry dl { grid-template-columns: 150px minmax(0, 1fr); } }
+  .entry dt { font-family: var(--sans); font-weight: 500; color: var(--muted); }
+  .entry dd { margin: 0 0 4px; white-space: pre-wrap; }
+  .entry .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .reviewbox { margin-top: 14px; padding: 14px; border: 1.5px dashed var(--line); border-radius: 4px; display: grid; gap: 12px; }
+  .empty { color: var(--muted); }
+
+  /* plan */
+  .progress { margin: 22px 0 6px; max-width: 40em; }
+  .bar { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--teal); transition: width 0.3s ease; }
+  .weeks { margin-top: 28px; display: grid; gap: 30px; }
+  .week h3 { font-size: 1.25rem; margin-bottom: 4px; }
+  .week ul { list-style: none; margin: 10px 0 0; padding: 0; }
+  .week li { border-top: 1px solid var(--line); }
+  .week label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 11px 0; cursor: pointer; }
+  .week input[type="checkbox"] { width: 20px; height: 20px; margin: 4px 0 0; accent-color: var(--teal); }
+  .week input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .rhythm { margin-top: 36px; max-width: 40em; }
+  .rhythm h3 { font-size: 1.3rem; margin-bottom: 8px; }
+  .rhythm dl { margin: 0; display: grid; gap: 4px 16px; }
+  @media (min-width: 620px) { .rhythm dl { grid-template-columns: 130px minmax(0, 1fr); } }
+  .rhythm dt { font-family: var(--sans); font-weight: 700; padding-top: 8px; border-top: 1px solid var(--line); }
+  .rhythm dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); }
+  @media (max-width: 619px) { .rhythm dd { border-top: 0; padding-top: 0; } }
+  .startsmall { margin-top: 30px; background: var(--marker); border-left: 4px solid var(--marker-edge); padding: 14px 18px; border-radius: 0 4px 4px 0; max-width: 40em; }
+  .startsmall p { margin: 0; }
+
+  /* caveats + sources */
+  .caveats { margin-top: 26px; max-width: 40em; }
+  .caveats p { padding-top: 14px; border-top: 1px solid var(--line); }
+  .caveats strong { font-family: var(--sans); }
+  .sources { columns: 1; column-gap: 40px; font-size: 0.93rem; margin-top: 18px; padding-left: 18px; }
+  @media (min-width: 760px) { .sources { columns: 2; } }
+  .sources li { break-inside: avoid; margin-bottom: 8px; }
+  footer { margin-top: 60px; color: var(--muted); font-size: 0.92rem; max-width: 40em; }
+
+  @media print { .toc, .sizer, .filters, .btn, .jform { display: none !important; } body { background: #fff; color: #000; } }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="toc" aria-label="Guide sections">
+    <span class="brand">Deciding<br>better</span>
+    <a href="#top">Start here</a>
+    <a href="#models">The models</a>
+    <a href="#biases">Bias counters</a>
+    <a href="#protocol">The protocol</a>
+    <a href="#journal">Decision journal</a>
+    <a href="#plan">30-day plan</a>
+    <a href="#caveats">Caveats</a>
+    <a href="#sources">Sources</a>
+    <button type="button" class="themebtn" id="themeBtn">Switch to dark</button>
+  </nav>
+
+  <main id="top">
+
+    <header class="hero">
+      <h1>Decide better, on purpose.</h1>
+      <p class="lede">A working guide to the mental models and habits that decision research supports, with a protocol, a journal and a 30-day plan for putting them to use.</p>
+      <p class="note"><strong>Read this first.</strong> No model guarantees a good outcome. What the evidence supports is a small set of practices that reduce predictable errors. Each entry below is marked for how strong its support is, so you can weigh it accordingly, and the advice at the end is to start with three, not twenty-two.</p>
+      <ul class="legend">
+        <li><span class="lab"><span class="meter" role="img" aria-label="Three filled dots"><i class="on"></i><i class="on"></i><i class="on"></i></span>Strong</span><span>Replicated studies, meta-analyses or large field results.</span></li>
+        <li><span class="lab"><span class="meter" role="img" aria-label="Two filled dots"><i class="on"></i><i class="on"></i><i></i></span>Good</span><span>Several studies or a solid mechanism, with thinner evidence on real-world outcomes.</span></li>
+        <li><span class="lab"><span class="meter" role="img" aria-label="One filled dot"><i class="on"></i><i></i><i></i></span>Heuristic</span><span>Widely used by practitioners, little direct testing. Treat as an experiment.</span></li>
+      </ul>
+
+      <div class="sizer" id="sizer">
+        <h2>Size your decision</h2>
+        <p class="muted" style="margin:0">Most wasted effort comes from treating every decision the same. Answer two questions.</p>
+        <div class="q">
+          <p>If it goes wrong, how hard is it to undo?</p>
+          <div class="seg" data-group="rev">
+            <button type="button" data-val="0" aria-pressed="false">Easy to undo</button>
+            <button type="button" data-val="1" aria-pressed="false">Partly reversible</button>
+            <button type="button" data-val="2" aria-pressed="false">Hard to undo</button>
+          </div>
+        </div>
+        <div class="q">
+          <p>How much is at stake (money, time, relationships, reputation)?</p>
+          <div class="seg" data-group="stk">
+            <button type="button" data-val="0" aria-pressed="false">Small</button>
+            <button type="button" data-val="1" aria-pressed="false">Medium</button>
+            <button type="button" data-val="2" aria-pressed="false">Large</button>
+          </div>
+        </div>
+        <div class="sizer-out" id="sizerOut" aria-live="polite"></div>
+      </div>
+    </header>
+
+    <section id="models">
+      <h2>The models</h2>
+      <p class="intro">Twenty-two tools in six groups. Each says what it is, what the research behind it shows, and one concrete thing to do with it.</p>
+      <div class="seg filters" id="filters" role="group" aria-label="Filter by group"></div>
+      <div id="modelList"></div>
+    </section>
+
+    <section id="biases">
+      <h2>Bias counters</h2>
+      <p class="intro">The models exist mainly to counter a handful of reliable errors. When you notice one of these pulling at a decision, reach for its counter.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Bias</th><th>How it distorts</th><th>What to do about it</th></tr></thead>
+          <tbody>
+            <tr><td>Confirmation bias</td><td>You look for and favor evidence that agrees with what you already think.</td><td>Ask what would change your mind. Write the case against your choice.</td></tr>
+            <tr><td>Overconfidence</td><td>Your certainty runs ahead of your accuracy.</td><td>Give probabilities and ranges, then score yourself in the journal.</td></tr>
+            <tr><td>Planning fallacy</td><td>You underestimate time, cost and risk.</td><td>Use the outside view: how long did comparable projects really take?</td></tr>
+            <tr><td>Anchoring</td><td>The first number you see drags your estimate toward it.</td><td>Form your own estimate before seeing anyone else's. Collect several reference points.</td></tr>
+            <tr><td>Sunk cost</td><td>What you have already spent pushes you to keep going.</td><td>Ask, "Knowing what I know now, would I start this today?" Set kill criteria in advance.</td></tr>
+            <tr><td>Status quo and loss aversion</td><td>Losses feel bigger than equal gains, so the default feels safe.</td><td>Reverse test: if I were already in the alternative, would I switch to where I am?</td></tr>
+            <tr><td>Hindsight bias</td><td>After the outcome, you remember having predicted it.</td><td>Write predictions down beforehand.</td></tr>
+            <tr><td>Availability</td><td>Vivid or recent stories feel more likely than they are.</td><td>Look up base rates instead of reasoning from anecdotes.</td></tr>
+            <tr><td>Narrow framing</td><td>You see one or two options and treat them as all there are.</td><td>Generate at least three, including a small test version.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="protocol">
+      <h2>The protocol for decisions that matter</h2>
+      <p class="intro">This is the models assembled into one sequence. Use it for anything the sizer marks as major, and a shortened version (steps 1, 3, 4, 6 and 8) for meaningful decisions.</p>
+      <ol class="steps">
+        <li>
+          <h3>Frame the decision</h3>
+          <div class="time">5 minutes</div>
+          <div>
+            <p>Write the decision as a question. Add what success looks like in concrete terms and the date by which you must decide. Check that you are solving the real problem and not a symptom.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-doors" data-model="doors">one-way and two-way doors</a></p>
+          </div>
+        </li>
+        <li>
+          <h3>Set a time budget and a state</h3>
+          <div class="time">2 minutes</div>
+          <div>
+            <p>Decide how long this deserves. Then check your own state: if you are angry, anxious, elated, hungry or exhausted, schedule the decision for later.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-cool" data-model="cool">cool-state rule</a></p>
+          </div>
+        </li>
+        <li>
+          <h3>Widen the options</h3>
+          <div class="time">10 to 20 minutes</div>
+          <div>
+            <p>List at least three real options, including a smaller test of the big one. Name the opportunity cost of your front-runner. If you can test cheaply before committing, design that test now.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-widen" data-model="widen">widen your options</a> <a class="mlink" href="#m-oppcost" data-model="oppcost">opportunity cost</a></p>
+          </div>
+        </li>
+        <li>
+          <h3>Take the outside view</h3>
+          <div class="time">15 to 30 minutes</div>
+          <div>
+            <p>Find comparable cases and how they turned out. Write your starting estimate from that base rate, then adjust only for specific, nameable differences. Put numbers on your confidence.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-outside" data-model="outside">outside view</a> <a class="mlink" href="#m-prob" data-model="prob">probabilistic thinking</a></p>
+          </div>
+        </li>
+        <li>
+          <h3>Score against criteria you set first</h3>
+          <div class="time">15 minutes</div>
+          <div>
+            <p>Choose four to six criteria and weights before rating options. Rate each option on each criterion separately. If the total disagrees with your gut, investigate the gap instead of overruling either.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-hygiene" data-model="hygiene">structured scoring</a> <a class="mlink" href="#m-ev" data-model="ev">expected value</a></p>
+          </div>
+        </li>
+        <li>
+          <h3>Stress-test the leader</h3>
+          <div class="time">20 minutes</div>
+          <div>
+            <p>Run a pre-mortem on your front-runner, write the strongest case against it, and trace the consequences two or three steps out. Ask one or two people for independent opinions before you tell them your leaning.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-premortem" data-model="premortem">pre-mortem</a> <a class="mlink" href="#m-opposite" data-model="opposite">consider the opposite</a> <a class="mlink" href="#m-second" data-model="second">second-order thinking</a></p>
+          </div>
+        </li>
+        <li>
+          <h3>Get distance, then sleep on it</h3>
+          <div class="time">One night</div>
+          <div>
+            <p>Apply the friend test and the 10-10-10 check. Remember that you will adapt to the outcome faster than you expect. If the decision is hard to reverse, let a night pass before committing.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-friend" data-model="friend">self-distancing</a> <a class="mlink" href="#m-tenx3" data-model="tenx3">10-10-10</a> <a class="mlink" href="#m-affective" data-model="affective">affective forecasting</a></p>
+          </div>
+        </li>
+        <li>
+          <h3>Commit and record</h3>
+          <div class="time">10 minutes</div>
+          <div>
+            <p>Log the decision, your prediction and your confidence. Write kill criteria and a review date. Turn the first action into an if-then plan so follow-through does not depend on willpower.</p>
+            <p class="uses">Uses <a class="mlink" href="#m-journal" data-model="journal">decision journal</a> <a class="mlink" href="#m-kill" data-model="kill">kill criteria</a> <a class="mlink" href="#m-ifthen" data-model="ifthen">if-then plans</a></p>
+          </div>
+        </li>
+      </ol>
+
+      <aside class="pocket">
+        <h3>Pocket questions</h3>
+        <ol>
+          <li>What exactly am I deciding, and what does success look like?</li>
+          <li>Is this a one-way or a two-way door?</li>
+          <li>What are at least three options, including a small test?</li>
+          <li>How do cases like this usually turn out?</li>
+          <li>What am I giving up by choosing this?</li>
+          <li>It is a year from now and this failed. Why?</li>
+          <li>What would I tell a friend, and what is the best case against my choice?</li>
+          <li>What would make me change course, and when will I check?</li>
+        </ol>
+      </aside>
+
+      <div class="scripts">
+        <details>
+          <summary>Script: a 10-minute pre-mortem</summary>
+          <ol>
+            <li>Describe the plan in two sentences and set a 10-minute timer.</li>
+            <li>Say, "It is one year from now. This failed badly."</li>
+            <li>Write every reason you can think of, without judging them. Aim for at least eight.</li>
+            <li>Circle the two or three most likely or most damaging.</li>
+            <li>For each, either change the plan or write an early warning sign you will watch for.</li>
+            <li>If you are doing this with others, have everyone write privately first, then share.</li>
+          </ol>
+        </details>
+        <details>
+          <summary>Script: an outside-view check</summary>
+          <ol>
+            <li>Name the category your decision belongs to (for example, "first-time founders opening a food business" or "job changes to a new industry").</li>
+            <li>Find three to five comparable cases from research, industry data, or people who have done it.</li>
+            <li>Write down how they turned out: success rate, typical time, typical cost.</li>
+            <li>Set your starting estimate to that range.</li>
+            <li>List specific reasons you differ. Move your estimate only as far as those reasons justify, and write them down.</li>
+          </ol>
+        </details>
+        <details>
+          <summary>Script: the friend test and 10-10-10</summary>
+          <ol>
+            <li>Write your situation in the third person, using your own name or "a friend".</li>
+            <li>Write the advice you would give that person.</li>
+            <li>Write how they would feel about each option in 10 minutes, 10 months and 10 years.</li>
+            <li>Compare the advice with what you were about to do. If they differ, write down why.</li>
+          </ol>
+        </details>
+      </div>
+    </section>
+
+    <section id="journal">
+      <h2>Decision journal</h2>
+      <p class="intro">The single most useful habit here is recording decisions before you know how they turn out. Entries are saved in this browser on this device only. Nothing is sent anywhere, so keep in mind that clearing your browser data will remove them.</p>
+
+      <div class="jform">
+        <div><label for="j-decision">The decision</label><input type="text" id="j-decision" maxlength="200" placeholder="For example: accept the contract, or keep looking"></div>
+        <div><label for="j-options">Options I considered</label><textarea id="j-options" placeholder="At least three, including a small test"></textarea></div>
+        <div><label for="j-choice">What I chose and why</label><textarea id="j-choice"></textarea></div>
+        <div><label for="j-pred">My prediction <span class="hint">Make it checkable, with a date if you can</span></label><textarea id="j-pred" placeholder="By 1 March I will have three paying customers"></textarea></div>
+        <div class="row2">
+          <div><label for="j-conf">Confidence that the prediction comes true: <output id="j-conf-out">70%</output></label><input type="range" id="j-conf" min="50" max="99" value="70"></div>
+          <div><label for="j-state">My state when deciding</label>
+            <select id="j-state"><option>calm and rested</option><option>excited</option><option>stressed</option><option>tired</option><option>rushed</option></select></div>
+        </div>
+        <div><label for="j-trip">I will stop or change course if <span class="hint">Your kill criteria</span></label><input type="text" id="j-trip" maxlength="240"></div>
+        <div><label for="j-review">Review date</label><input type="date" id="j-review"></div>
+        <div><button type="button" class="btn" id="j-save">Save entry</button></div>
+        <div class="msg" id="j-msg" aria-live="polite"></div>
+      </div>
+
+      <div class="calib" id="calib" aria-live="polite"></div>
+      <div class="entries" id="entries"></div>
+    </section>
+
+    <section id="plan">
+      <h2>A 30-day plan to make it stick</h2>
+      <p class="intro">Adding everything at once is a reliable way to keep nothing. This plan builds one layer per week. Tick items as you complete them; your progress is saved in this browser.</p>
+
+      <div class="startsmall"><p><strong>If you only do three things:</strong> keep the decision journal, run a pre-mortem before big commitments, and check the outside view before you trust your own estimate. Add the rest once those feel routine.</p></div>
+
+      <div class="progress">
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="pbar"><span id="pfill"></span></div>
+        <p class="muted" id="ptext" style="margin-top:8px"></p>
+      </div>
+      <div class="weeks" id="weeks"></div>
+      <p><button type="button" class="btn ghost small" id="resetPlan">Reset plan progress</button></p>
+
+      <div class="rhythm">
+        <h3>The rhythm after 30 days</h3>
+        <dl>
+          <dt>Daily, 2 minutes</dt><dd>Log any decision that mattered, with a prediction.</dd>
+          <dt>Weekly, 20 minutes</dt><dd>Review due entries. Ask: which decisions did I make this week? Did I size them? Where did I notice a bias? What is one thing I will try next week?</dd>
+          <dt>Monthly, 30 minutes</dt><dd>Check your calibration summary. Are you consistently over- or under-confident? Adjust your confidence numbers accordingly.</dd>
+          <dt>Quarterly, 1 hour</dt><dd>Update your personal checklist. Drop any practice that has not earned its time and add one you are missing.</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section id="caveats">
+      <h2>Where the evidence is thinner</h2>
+      <p class="intro">Good guidance should say where it is uncertain.</p>
+      <div class="caveats">
+        <p><strong>Decision fatigue is shakier than its reputation.</strong> The well-known parole-judge study (Danziger, Levav and Avnaim-Pesso, 2011) has been criticized on methodological grounds, and a large multi-lab replication of the broader ego-depletion effect (Hagger et al., 2016) found little to no effect. Incidental emotions do leak into unrelated choices (Lerner, Small and Loewenstein, 2004), so the cool-state rule still stands, but for that reason rather than because willpower runs out.</p>
+        <p><strong>Your gut is not always the enemy.</strong> Kahneman and Klein (2009) agreed that intuition can be trusted where the environment is regular and you have had plenty of fast feedback, as in chess or firefighting. It is unreliable in noisy, low-feedback domains such as long-range forecasting or new ventures. Lean on the models most where you lack that kind of practice.</p>
+        <p><strong>Good process does not guarantee good outcomes.</strong> Luck is real. Judge a decision by what you knew and how you reasoned, which is why the journal asks you to separate the two when you review.</p>
+        <p><strong>Knowing many models is not the same as using them.</strong> The evidence supports specific practices: the outside view, pre-mortems, if-then plans, structured scoring and feedback. I am not aware of good evidence that memorizing a long list of models improves decisions on its own.</p>
+        <p><strong>Effect sizes come from particular settings.</strong> Many findings come from lab studies, hospitals or organizations. Applying them to personal decisions is a reasonable extrapolation, not a proven result. Treat the heuristics especially as experiments and let your own journal tell you what works for you.</p>
+      </div>
+    </section>
+
+    <section id="sources">
+      <h2>Sources and further reading</h2>
+      <p class="intro">Listed so you can look them up. Check the originals before quoting specific figures.</p>
+      <h3 style="margin-top:26px;font-size:1.15rem">Books</h3>
+      <ul class="sources">
+        <li>Daniel Kahneman, <em>Thinking, Fast and Slow</em> (2011)</li>
+        <li>Kahneman, Sibony and Sunstein, <em>Noise</em> (2021)</li>
+        <li>Philip Tetlock and Dan Gardner, <em>Superforecasting</em> (2015)</li>
+        <li>Chip Heath and Dan Heath, <em>Decisive</em> (2013)</li>
+        <li>Annie Duke, <em>Thinking in Bets</em> (2018) and <em>Quit</em> (2022)</li>
+        <li>Atul Gawande, <em>The Checklist Manifesto</em> (2009)</li>
+        <li>Gabriele Oettingen, <em>Rethinking Positive Thinking</em> (2014)</li>
+        <li>Howard Marks, <em>The Most Important Thing</em> (2011)</li>
+      </ul>
+      <h3 style="margin-top:26px;font-size:1.15rem">Papers and articles</h3>
+      <ul class="sources">
+        <li>Arkes and Blumer (1985), The psychology of sunk cost</li>
+        <li>Buehler, Griffin and Ross (1994), Exploring the planning fallacy</li>
+        <li>Fischhoff (1975), Hindsight is not equal to foresight</li>
+        <li>Frederick et al. (2009), Opportunity cost neglect, <em>Journal of Consumer Research</em></li>
+        <li>Gilovich and Medvec (1995), The experience of regret</li>
+        <li>Gollwitzer and Sheeran (2006), Implementation intentions and goal achievement: a meta-analysis</li>
+        <li>Grossmann and Kross (2014), Exploring Solomon's paradox</li>
+        <li>Grove et al. (2000), Clinical versus mechanical prediction: a meta-analysis</li>
+        <li>Hagger et al. (2016), A multilab preregistered replication of the ego-depletion effect</li>
+        <li>Iyengar, Wells and Schwartz (2006), Doing better but feeling worse</li>
+        <li>Kahneman and Klein (2009), Conditions for intuitive expertise: a failure to disagree</li>
+        <li>Kahneman and Lovallo (1993), Timid choices and bold forecasts</li>
+        <li>Klein (2007), Performing a project premortem, <em>Harvard Business Review</em></li>
+        <li>Kross et al. (2014), Self-talk as a regulatory mechanism</li>
+        <li>Lerner, Small and Loewenstein (2004), Heart strings and purse strings</li>
+        <li>Lord, Lepper and Preston (1984), Considering the opposite</li>
+        <li>Mellers et al. (2014), Psychological strategies for winning a geopolitical forecasting tournament</li>
+        <li>Mitchell, Russo and Pennington (1989), Back to the future: temporal perspective in the explanation of events</li>
+        <li>Nickerson (1998), Confirmation bias: a ubiquitous phenomenon</li>
+        <li>Nutt (1999), Surprising but true: half the decisions in organizations fail</li>
+        <li>Pronovost et al. (2006), An intervention to decrease catheter-related bloodstream infections in the ICU, <em>NEJM</em></li>
+        <li>Samuelson and Zeckhauser (1988), Status quo bias in decision making</li>
+        <li>Schmidt and Hunter (1998), The validity and utility of selection methods in personnel psychology</li>
+        <li>Schwartz et al. (2002), Maximizing versus satisficing: happiness is a matter of choice</li>
+        <li>Staw (1976), Knee-deep in the big muddy</li>
+        <li>Trope and Liberman (2010), Construal-level theory of psychological distance</li>
+        <li>Tversky and Kahneman (1974), Judgment under uncertainty: heuristics and biases</li>
+        <li>Wilson and Gilbert (2005), Affective forecasting: knowing what to want</li>
+      </ul>
+      <footer>This guide is general educational material, not professional advice. For major financial, legal or health decisions, use these tools alongside qualified advice.</footer>
+    </section>
+
+  </main>
+</div>
+
+<noscript><p style="padding:20px">The interactive parts of this guide (model list, sizer, journal and plan) need JavaScript.</p></noscript>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- storage helpers (private to this browser; always guarded) ---------- */
+  var mem = {};
+  function sget(k, fb) {
+    try { var v = localStorage.getItem(k); if (v !== null) return JSON.parse(v); } catch (e) {}
+    return (k in mem) ? mem[k] : fb;
+  }
+  function sset(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function h(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null) e.textContent = text;
+    return e;
+  }
+
+  /* ---------- theme ---------- */
+  var root = document.documentElement;
+  var savedTheme = sget('dg_theme', null);
+  if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  function currentTheme() {
+    return root.getAttribute('data-theme') || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  var themeBtn = $('#themeBtn');
+  function labelTheme() { themeBtn.textContent = currentTheme() === 'dark' ? 'Switch to light' : 'Switch to dark'; }
+  themeBtn.addEventListener('click', function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next); sset('dg_theme', next); labelTheme();
+  });
+  labelTheme();
+
+  /* ---------- model data ---------- */
+  var groups = [
+    { id: 'size', name: 'Match effort to stakes', blurb: 'Spending equal effort on every decision wastes energy on small ones and starves the big ones.' },
+    { id: 'see', name: 'See the situation clearly', blurb: 'Bad decisions often start with a distorted picture: rosy estimates, vivid anecdotes, a strong first impression.' },
+    { id: 'widen', name: 'Widen the options', blurb: 'Before comparing options, make sure you have good ones, and that you know what each really costs.' },
+    { id: 'test', name: 'Stress-test the plan', blurb: 'Find the weak points while changing course is still cheap.' },
+    { id: 'distance', name: 'Get distance from the moment', blurb: 'Your judgment about your own life is worse than your judgment about someone else\u2019s. These close the gap.' },
+    { id: 'follow', name: 'Follow through and learn', blurb: 'A good decision you do not execute, or never learn from, is wasted.' }
+  ];
+
+  var models = [
+    { id: 'doors', g: 'size', name: 'One-way and two-way doors', ev: 1,
+      what: `Ask how costly the decision is to reverse. Reversible ("two-way door") decisions can be made fast and corrected. Irreversible ("one-way door") ones deserve slow, careful thought.`,
+      research: `Popularized by Jeff Bezos in his 2015 shareholder letter. It is a practitioner heuristic rather than a tested intervention, but it targets a common failure: giving every decision the same amount of deliberation regardless of stakes.`,
+      act: `Label each decision "two-way" or "one-way". For two-way doors, decide once you have roughly 70% of the information you wish you had, and set a date to re-check. For one-way doors, use the full protocol.` },
+    { id: 'satisfice', g: 'size', name: 'Satisficing over maximizing', ev: 2,
+      what: `Maximizers hunt for the best possible option. Satisficers pick the first option that clears a bar they set in advance. For most decisions, satisficing costs little and gives back time and peace of mind.`,
+      research: `Herbert Simon introduced satisficing in the 1950s. Schwartz et al. (2002) found maximizers reported less happiness and more regret. Iyengar, Wells and Schwartz (2006) found maximizing job-seekers landed roughly 20% higher starting salaries yet felt worse about them, so maximizing can improve outcomes while costing wellbeing.`,
+      act: `For low-stakes choices, write your "good enough" criteria first, then stop at the first option that meets them. Save exhaustive searching for the few decisions where the stakes justify it.` },
+    { id: 'ev', g: 'size', name: 'Expected value and asymmetric bets', ev: 2,
+      what: `Weigh each outcome by both its size and its likelihood. Prefer bets where the downside is capped and the upside is large, and never risk something you cannot afford to lose.`,
+      research: `Expected-value reasoning is the standard foundation of decision theory. Its weakness is that the inputs are estimates, which is why it pairs with base rates and calibration. Kahneman and Tversky's prospect theory documents how people systematically misweigh probabilities and losses.`,
+      act: `List best, likely and worst outcomes with rough probabilities and payoffs. Ask, "Can I survive the worst case?" If not, skip the bet however good the average looks. Look for ways to cap the downside, such as a small pilot before a full commitment.` },
+
+    { id: 'outside', g: 'see', name: 'Outside view and base rates', ev: 3,
+      what: `Your own case always feels unique. The outside view asks a plainer question first: how do cases like this usually turn out? Start from that base rate, then adjust for what genuinely sets you apart.`,
+      research: `Kahneman and Lovallo (1993) distinguished the inside view from the outside view. The planning fallacy (Buehler, Griffin and Ross, 1994) shows people underestimate time and cost even when they know similar projects ran over. Flyvbjerg's reference-class forecasting, built on this idea, is used in appraising large public projects.`,
+      act: `Find three to five comparable cases: businesses in your niche, similar career moves, your own past projects. Write down how long they took and how many worked out. Use that range as your starting estimate and adjust only for specific, nameable reasons.` },
+    { id: 'prob', g: 'see', name: 'Probabilistic thinking', ev: 3,
+      what: `Replace "it will work" or "it won't" with a number. Treat the number as a working estimate that you update in small steps as evidence arrives.`,
+      research: `In the Good Judgment Project forecasting tournaments, short training in probabilistic reasoning measurably improved accuracy (Mellers et al., 2014). Tetlock's "superforecasters" stood out for making granular estimates and revising them often.`,
+      act: `For any important call, write: "I'm __% confident that __ by __ date." When new information arrives, ask whether it moves the number up or down, and by how much. Avoid reflexive 0%, 50% and 100%.` },
+    { id: 'hygiene', g: 'see', name: 'Structured scoring (decision hygiene)', ev: 3,
+      what: `Choose the criteria before you look at the options, rate each option on each criterion separately, and only then form an overall view. This stops a vivid first impression from silently steering everything.`,
+      research: `Meehl (1954) and a later meta-analysis by Grove et al. (2000) found that simple, mechanical combinations of criteria matched or beat holistic expert judgment in most comparisons. Structured job interviews predict performance better than unstructured ones (Schmidt and Hunter, 1998). Kahneman, Sibony and Sunstein build on this in <em>Noise</em> (2021).`,
+      act: `List four to six criteria that matter (cost, learning, risk, energy, fit with long-term goals), weight them, score each option 1 to 5 on each, and total. If the total disagrees with your gut, do not overrule either; work out why they differ.` },
+
+    { id: 'widen', g: 'widen', name: 'Widen your options', ev: 2,
+      what: `Many decisions get framed as "should I do X or not?", which quietly limits you to one option. Deliberately generate more.`,
+      research: `Paul Nutt's studies of hundreds of organizational decisions found that roughly half failed, and that considering only a single option was a common feature of the failures (Nutt, 1999). Chip and Dan Heath made this the "widen your options" step of their WRAP process in <em>Decisive</em> (2013).`,
+      act: `Force at least three genuine options, including a smaller or cheaper version of the big one. Ask, "What would I do if this option disappeared?" and "Who has already solved this, and how?"` },
+    { id: 'oppcost', g: 'widen', name: 'Opportunity cost', ev: 2,
+      what: `Every yes is a no to something else. The real price of an option is the best alternative you give up.`,
+      research: `Frederick et al. (2009) found that people often neglect opportunity costs when deciding, and that choices shift when they are prompted to think about what else the money could buy.`,
+      act: `Finish this sentence before committing: "By choosing this, I'm not choosing ___." Name the best alternative use of the same time, money or energy, and check that your choice still wins.` },
+
+    { id: 'premortem', g: 'test', name: 'Pre-mortem', ev: 2,
+      what: `Imagine it is a year from now and the decision has failed badly. Write down why. Doing this before you commit surfaces risks that optimism and group politics normally suppress.`,
+      research: `Gary Klein developed the technique from research on prospective hindsight. Mitchell, Russo and Pennington (1989) found that imagining an event has already happened increased people's ability to identify reasons for the outcome by about 30%. Klein's 2007 <em>Harvard Business Review</em> article describes its use in project planning.`,
+      act: `Set a 10-minute timer and write "It failed because..." with five to ten reasons, uncensored. Circle the top two or three, then either change the plan to address them or define an early warning sign for each. A script is in the protocol section.` },
+    { id: 'opposite', g: 'test', name: 'Consider the opposite', ev: 2,
+      what: `Deliberately build the strongest case against your preferred option, or ask someone else to.`,
+      research: `Lord, Lepper and Preston (1984) found that instructing people to consider the opposite reduced biased evaluation of evidence, while simply telling them to be fair did not. Confirmation bias is among the most robust findings in the field (Nickerson, 1998).`,
+      act: `Write three reasons your favored option could be wrong and three reasons your least-liked option could be right. Better still, ask a trusted person to argue against you, and listen without defending.` },
+    { id: 'inversion', g: 'test', name: 'Inversion', ev: 1,
+      what: `Instead of asking how to succeed, ask what would guarantee failure, then avoid it. Some problems are easier to solve backwards.`,
+      research: `Charlie Munger popularized the habit, borrowing the mathematician Jacobi's advice to "invert, always invert". It has no dedicated experiments, but it uses the same mechanism as the pre-mortem: thinking about failure surfaces risks that goal-focused thinking hides.`,
+      act: `Write "How could I guarantee a terrible result here?" and list five ways. Then check how many of them your current plan resembles.` },
+    { id: 'second', g: 'test', name: 'Second-order thinking', ev: 1,
+      what: `First-order thinking asks what happens next. Second-order thinking asks "and then what?" Many attractive choices have delayed costs, and many painful ones have delayed benefits.`,
+      research: `Associated with investor Howard Marks and rooted in the long-recognized problem of unintended consequences. It is practitioner wisdom rather than experimentally tested.`,
+      act: `For a big choice, write a chain: "If I do this, then immediately... in six months... in three years..." Ask who else is affected and how they are likely to respond.` },
+
+    { id: 'friend', g: 'distance', name: 'Self-distancing (the friend test)', ev: 2,
+      what: `We reason more wisely about other people's dilemmas than our own. Taking an outside perspective on your situation closes much of that gap.`,
+      research: `Grossmann and Kross (2014) documented "Solomon's paradox": people showed wiser reasoning about others' relationship problems than their own. Kross and colleagues (2014) found that thinking about yourself in the third person, or by your own name, reduced emotional reactivity.`,
+      act: `Ask, "What would I advise a friend in exactly this position?" Or write about your decision in the third person: "Sam is deciding whether..." Then follow the advice you gave.` },
+    { id: 'tenx3', g: 'distance', name: '10-10-10', ev: 1,
+      what: `Ask how you will feel about the decision in ten minutes, ten months and ten years.`,
+      research: `Popularized by Suzy Welch. It is a practitioner tool consistent with construal-level research (Trope and Liberman, 2010), which shows that psychological distance shifts attention from immediate details to long-term considerations.`,
+      act: `Write one line for each time horizon. If the answers conflict, you have found the real tension: short-term comfort against long-term value.` },
+    { id: 'affective', g: 'distance', name: 'Affective forecasting check', ev: 2,
+      what: `We overestimate how intensely, and for how long, future events will change our feelings, whether good or bad. That distorts big choices about jobs, moves, purchases and relationships.`,
+      research: `Wilson and Gilbert (2005) review the "impact bias" across many studies: people predicted stronger and longer-lasting emotional reactions than they actually experienced.`,
+      act: `Ask people who have been through it how they felt six months afterward. Discount both your predicted excitement and your predicted dread, and assume you will adapt.` },
+    { id: 'regret', g: 'distance', name: 'Regret minimization', ev: 2,
+      what: `Project yourself to age 80 and ask which choice you would regret not having made.`,
+      research: `Jeff Bezos described using this framework when he left his job to start Amazon. The underlying pattern has support: Gilovich and Medvec (1995) found that in the short term people regret actions more, but over the long run they regret inactions more. Because it nudges toward action, pair it with the door test and a pre-mortem.`,
+      act: `Write the regret you would feel at 80 for doing it and for not doing it. If the second is much stronger and the downside is survivable, that is meaningful information.` },
+    { id: 'cool', g: 'distance', name: 'Cool-state rule', ev: 2,
+      what: `Do not make big decisions when you are angry, anxious, elated, hungry or exhausted. Strong states change what you value and what you notice, even for choices unrelated to the feeling.`,
+      research: `Lerner, Small and Loewenstein (2004) showed that incidental emotions such as sadness and disgust changed how people priced and traded goods in unrelated situations. See the caveats section on decision fatigue.`,
+      act: `Before a major decision, check your state. If it is hot, write the decision down, sleep, and reread it. Make "no big commitments while upset" one of your if-then rules.` },
+
+    { id: 'ifthen', g: 'follow', name: 'If-then plans (implementation intentions)', ev: 3,
+      what: `Decide in advance exactly when and where you will act: "If situation X, then I will do Y." It hands control to the cue instead of relying on willpower in the moment.`,
+      research: `Gollwitzer and Sheeran's (2006) meta-analysis of 94 studies found a medium-to-large effect on goal attainment (d of about 0.65) compared with simply intending to act.`,
+      act: `Turn each decision into a trigger: "If it is Sunday at 6 pm, then I do my weekly review." "If I feel the urge to reopen a settled decision, then I read my journal entry first."` },
+    { id: 'woop', g: 'follow', name: 'Mental contrasting (WOOP)', ev: 2,
+      what: `Positive visualization alone can sap effort. Pair the wish with the main obstacle and a plan for it.`,
+      research: `Gabriele Oettingen's research found that mental contrasting, imagining the desired future and then the obstacles, improves follow-through more than positive fantasizing alone. Her WOOP method (Wish, Outcome, Obstacle, Plan) is the practical version. It works best when the goal feels realistic.`,
+      act: `Write four lines: your Wish, the best Outcome, the main inner Obstacle, and an if-then Plan for that obstacle.` },
+    { id: 'journal', g: 'follow', name: 'Decision journal', ev: 2,
+      what: `Record the decision, your reasoning, your prediction and your confidence before you know the result, then review later.`,
+      research: `Fischhoff (1975) showed hindsight bias: once we know an outcome, we misremember what we predicted, and a written record defeats that. Forecasting research shows that feedback and scoring are what improve calibration. Annie Duke calls judging a decision purely by its outcome "resulting".`,
+      act: `Use the journal further down this page. Log decisions that matter and schedule a review date. When reviewing, separate "was my process good?" from "was I lucky or unlucky?"` },
+    { id: 'kill', g: 'follow', name: 'Kill criteria and tripwires', ev: 2,
+      what: `Decide in advance what evidence would make you quit or change course, while you are calm and not yet emotionally invested.`,
+      research: `Escalation of commitment (Staw, 1976) and the sunk-cost effect (Arkes and Blumer, 1985) show that people keep investing in failing courses of action because of what they have already spent. Annie Duke's <em>Quit</em> (2022) advocates pre-set kill criteria.`,
+      act: `Write "I will stop or pivot if ___ by ___ date." Put it in your journal and your calendar. At the review, ask, "Knowing what I know now, would I start this today?"` },
+    { id: 'checklist', g: 'follow', name: 'Checklists', ev: 3,
+      what: `For recurring, high-stakes decisions or processes, a short checklist catches the errors that experts make when stressed or rushed.`,
+      research: `Pronovost et al. (2006) reported that a five-item checklist for inserting central lines cut ICU infection rates dramatically across Michigan hospitals. Gawande's <em>The Checklist Manifesto</em> (2009) covers similar results in surgery and aviation. The evidence comes from procedural settings; for personal decisions it is a reasonable extrapolation.`,
+      act: `Write a six to eight item checklist for one recurring decision (starting a project, signing a contract, a large purchase) and use it every time. The protocol above is a good first draft.` }
+  ];
+
+  var evLabel = { 3: 'Strong', 2: 'Good', 1: 'Heuristic' };
+  var currentFilter = 'all';
+
+  function meterHTML(n) {
+    var s = '<span class="meter" role="img" aria-label="' + evLabel[n] + ' evidence">';
+    for (var i = 1; i <= 3; i++) s += '<i' + (i <= n ? ' class="on"' : '') + '></i>';
+    return s + '</span>';
+  }
+
+  function renderModels() {
+    var list = $('#modelList'); list.innerHTML = '';
+    groups.forEach(function (g) {
+      if (currentFilter !== 'all' && currentFilter !== g.id) return;
+      var wrap = h('div', 'group');
+      wrap.appendChild(h('h3', null, g.name));
+      wrap.appendChild(h('p', null, g.blurb));
+      models.filter(function (m) { return m.g === g.id; }).forEach(function (m) {
+        var a = h('article', 'model'); a.id = 'm-' + m.id;
+        a.innerHTML =
+          '<header><h4>' + m.name + '</h4><div class="ev">' + meterHTML(m.ev) + '<span>' + evLabel[m.ev] + '</span></div></header>' +
+          '<div class="body">' +
+          '<p>' + m.what + '</p>' +
+          '<p class="research"><span class="lbl">The research.</span>' + m.research + '</p>' +
+          '<p class="act"><span class="lbl">Try this.</span>' + m.act + '</p>' +
+          '</div>';
+        wrap.appendChild(a);
+      });
+      list.appendChild(wrap);
+    });
+  }
+
+  function renderFilters() {
+    var f = $('#filters'); f.innerHTML = '';
+    var all = [{ id: 'all', name: 'All groups' }].concat(groups);
+    all.forEach(function (g) {
+      var b = h('button', null, g.name); b.type = 'button';
+      b.setAttribute('aria-pressed', String(currentFilter === g.id));
+      b.addEventListener('click', function () { setFilter(g.id); });
+      f.appendChild(b);
+    });
+  }
+  function setFilter(id) { currentFilter = id; renderFilters(); renderModels(); }
+
+  function goModel(id) {
+    if (currentFilter !== 'all') setFilter('all');
+    var el = document.getElementById('m-' + id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a.mlink') : null;
+    if (!a) return;
+    e.preventDefault(); goModel(a.getAttribute('data-model'));
+  });
+
+  renderFilters(); renderModels();
+
+  /* ---------- sizer ---------- */
+  var tiers = {
+    everyday: {
+      name: 'Everyday decision', time: 'Under 10 minutes.',
+      text: 'Set a good-enough bar, take the first option that clears it, and move on. Put your effort into following through, not deliberating.',
+      reach: [['satisfice', 'Satisficing'], ['doors', 'Two-way doors'], ['ifthen', 'If-then plans']]
+    },
+    meaningful: {
+      name: 'Meaningful decision', time: '20 to 60 minutes, ideally with a night in between.',
+      text: 'Widen the options, check how similar cases went, get some distance, and log it. Use steps 1, 3, 4, 6 and 8 of the protocol.',
+      reach: [['widen', 'Widen your options'], ['outside', 'Outside view'], ['friend', 'Friend test'], ['premortem', 'Pre-mortem'], ['journal', 'Decision journal']]
+    },
+    major: {
+      name: 'Major decision', time: 'Days to weeks. Do not rush it.',
+      text: 'Run the full protocol. Score options on criteria you set first, stress-test the leader, take a night, then commit with kill criteria and a review date.',
+      reach: [['outside', 'Outside view'], ['widen', 'Widen your options'], ['hygiene', 'Structured scoring'], ['premortem', 'Pre-mortem'], ['opposite', 'Consider the opposite'], ['cool', 'Cool-state rule'], ['kill', 'Kill criteria'], ['journal', 'Decision journal']]
+    }
+  };
+  var sz = { rev: null, stk: null };
+  function updateSizer() {
+    var out = $('#sizerOut'); out.innerHTML = '';
+    if (sz.rev === null || sz.stk === null) {
+      out.appendChild(h('p', 'muted', 'Pick one answer in each row and your recommended approach appears here.'));
+      return;
+    }
+    var score = sz.rev + sz.stk;
+    var t = tiers[score <= 1 ? 'everyday' : score === 2 ? 'meaningful' : 'major'];
+    out.appendChild(h('h3', null, t.name));
+    out.appendChild(h('p', 'time', 'Time to spend: ' + t.time));
+    out.appendChild(h('p', null, t.text));
+    var ul = h('ul', 'reach');
+    t.reach.forEach(function (r) {
+      var li = document.createElement('li');
+      var a = h('a', 'mlink', r[1]); a.href = '#m-' + r[0]; a.setAttribute('data-model', r[0]);
+      li.appendChild(a); ul.appendChild(li);
+    });
+    out.appendChild(ul);
+    var p = document.createElement('p');
+    var link = h('a', null, 'See the full protocol'); link.href = '#protocol';
+    p.appendChild(link); out.appendChild(p);
+  }
+  $$('#sizer .seg').forEach(function (seg) {
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      sz[seg.getAttribute('data-group')] = Number(b.getAttribute('data-val'));
+      $$('button', seg).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      updateSizer();
+    });
+  });
+  updateSizer();
+
+  /* ---------- journal ---------- */
+  var KJ = 'dg_journal_v1';
+  function todayStr() { return new Date().toISOString().slice(0, 10); }
+  function addDays(n) { return new Date(Date.now() + n * 864e5).toISOString().slice(0, 10); }
+  $('#j-review').value = addDays(30);
+  $('#j-conf').addEventListener('input', function () { $('#j-conf-out').textContent = $('#j-conf').value + '%'; });
+
+  $('#j-save').addEventListener('click', function () {
+    var msg = $('#j-msg');
+    var decision = $('#j-decision').value.trim();
+    var prediction = $('#j-pred').value.trim();
+    if (!decision || !prediction) { msg.textContent = 'Add the decision and a checkable prediction before saving.'; return; }
+    var entries = sget(KJ, []);
+    var review = $('#j-review').value || addDays(30);
+    entries.unshift({
+      id: String(Date.now()), created: todayStr(), decision: decision,
+      options: $('#j-options').value.trim(), choice: $('#j-choice').value.trim(),
+      prediction: prediction, confidence: Number($('#j-conf').value), state: $('#j-state').value,
+      tripwire: $('#j-trip').value.trim(), review: review, status: 'open'
+    });
+    sset(KJ, entries);
+    ['j-decision', 'j-options', 'j-choice', 'j-pred', 'j-trip'].forEach(function (id) { $('#' + id).value = ''; });
+    $('#j-conf').value = 70; $('#j-conf-out').textContent = '70%'; $('#j-review').value = addDays(30);
+    msg.textContent = 'Saved. Review it on ' + review + '.';
+    renderJournal();
+  });
+
+  function field(dl, label, value) {
+    if (!value) return;
+    dl.appendChild(h('dt', null, label)); dl.appendChild(h('dd', null, value));
+  }
+
+  function entryEl(e, entries) {
+    var art = h('article', 'entry');
+    var head = h('div', 'entry-head');
+    head.appendChild(h('h4', null, e.decision));
+    var st;
+    if (e.status === 'reviewed') st = h('span', 'status', 'Reviewed');
+    else if (e.review <= todayStr()) st = h('span', 'status due', 'Due for review');
+    else st = h('span', 'status', 'Review on ' + e.review);
+    head.appendChild(st); art.appendChild(head);
+
+    var dl = h('dl');
+    field(dl, 'Logged', e.created);
+    field(dl, 'Options considered', e.options);
+    field(dl, 'Chose and why', e.choice);
+    field(dl, 'Prediction', e.prediction);
+    field(dl, 'Confidence', e.confidence + '%');
+    field(dl, 'State when deciding', e.state);
+    field(dl, 'Stop or change if', e.tripwire);
+    if (e.status === 'reviewed') {
+      field(dl, 'Outcome', e.outcome === 'yes' ? 'The prediction came true' : 'The prediction did not come true');
+      field(dl, 'Lesson', e.lesson);
+    }
+    art.appendChild(dl);
+
+    var actions = h('div', 'actions');
+    if (e.status === 'open') {
+      var rb = h('button', 'btn small', 'Review this entry'); rb.type = 'button';
+      var box = null;
+      rb.addEventListener('click', function () {
+        if (box) { art.removeChild(box); box = null; return; }
+        box = h('div', 'reviewbox');
+        var outcome = null;
+        box.appendChild(h('p', null, 'Did the prediction come true?'));
+        var seg = h('div', 'seg');
+        var yes = h('button', null, 'Yes, it did'); yes.type = 'button'; yes.setAttribute('aria-pressed', 'false');
+        var no = h('button', null, 'No, it did not'); no.type = 'button'; no.setAttribute('aria-pressed', 'false');
+        yes.addEventListener('click', function () { outcome = 'yes'; yes.setAttribute('aria-pressed', 'true'); no.setAttribute('aria-pressed', 'false'); });
+        no.addEventListener('click', function () { outcome = 'no'; no.setAttribute('aria-pressed', 'true'); yes.setAttribute('aria-pressed', 'false'); });
+        seg.appendChild(yes); seg.appendChild(no); box.appendChild(seg);
+        var lab = h('label', null, 'What did I learn? Was it the process or luck?'); lab.style.fontFamily = 'var(--sans)';
+        var ta = document.createElement('textarea'); ta.setAttribute('aria-label', 'Lesson');
+        box.appendChild(lab); box.appendChild(ta);
+        var note = h('div', 'msg');
+        var save = h('button', 'btn small', 'Save review'); save.type = 'button';
+        save.addEventListener('click', function () {
+          if (!outcome) { note.textContent = 'Choose whether the prediction came true.'; return; }
+          var all = sget(KJ, []);
+          all.forEach(function (x) { if (x.id === e.id) { x.status = 'reviewed'; x.outcome = outcome; x.lesson = ta.value.trim(); x.reviewedOn = todayStr(); } });
+          sset(KJ, all); renderJournal();
+        });
+        box.appendChild(save); box.appendChild(note);
+        art.appendChild(box);
+      });
+      actions.appendChild(rb);
+    }
+    var del = h('button', 'btn ghost small', 'Delete'); del.type = 'button';
+    var armed = false;
+    del.addEventListener('click', function () {
+      if (!armed) { armed = true; del.textContent = 'Click again to delete'; return; }
+      var all = sget(KJ, []).filter(function (x) { return x.id !== e.id; });
+      sset(KJ, all); renderJournal();
+    });
+    actions.appendChild(del);
+    art.appendChild(actions);
+    return art;
+  }
+
+  function renderCalibration(entries) {
+    var box = $('#calib'); box.innerHTML = '';
+    box.appendChild(h('h3', null, 'Your calibration'));
+    var rev = entries.filter(function (x) { return x.status === 'reviewed'; });
+    if (!rev.length) {
+      box.appendChild(h('p', 'muted', 'Review a few entries and this will show how your confidence compares with how often you were right. Ten or more reviews give a meaningful picture.'));
+      return;
+    }
+    var avgConf = rev.reduce(function (s, x) { return s + x.confidence; }, 0) / rev.length;
+    var hit = rev.filter(function (x) { return x.outcome === 'yes'; }).length / rev.length * 100;
+    var nums = h('div', 'nums');
+    [[Math.round(avgConf) + '%', 'average confidence'], [Math.round(hit) + '%', 'predictions that came true'], [String(rev.length), 'reviewed']].forEach(function (p) {
+      var d = document.createElement('div'); var b = h('b', null, p[0]); d.appendChild(b); d.appendChild(document.createTextNode(p[1])); nums.appendChild(d);
+    });
+    box.appendChild(nums);
+    var gap = avgConf - hit, verdict;
+    if (rev.length < 5) verdict = 'That is too few reviews to draw a conclusion. Keep going.';
+    else if (gap > 10) verdict = 'You lean overconfident. Try shaving your confidence numbers and widening your ranges.';
+    else if (gap < -10) verdict = 'You lean underconfident. You are right more often than you expect, so you can trust your judgment more here.';
+    else verdict = 'Your confidence is close to your hit rate. Well calibrated so far.';
+    box.appendChild(h('p', null, verdict));
+  }
+
+  function renderJournal() {
+    var entries = sget(KJ, []);
+    renderCalibration(entries);
+    var wrap = $('#entries'); wrap.innerHTML = '';
+    if (!entries.length) { wrap.appendChild(h('p', 'empty', 'No entries yet. Log a decision above to start your record.')); return; }
+    var open = entries.filter(function (x) { return x.status !== 'reviewed'; }).sort(function (a, b) { return a.review < b.review ? -1 : 1; });
+    var done = entries.filter(function (x) { return x.status === 'reviewed'; });
+    open.concat(done).forEach(function (e) { wrap.appendChild(entryEl(e, entries)); });
+  }
+  renderJournal();
+
+  /* ---------- 30-day plan ---------- */
+  var KP = 'dg_plan_v1';
+  var plan = [
+    { title: 'Week 1: Notice how you decide', items: [
+      ['p1', 'Log your first three real decisions in the journal, each with a prediction and a confidence.'],
+      ['p2', 'Label every decision you make this week as a one-way or two-way door.'],
+      ['p3', 'Write down your three most frequent or costly recurring decisions (money, work, time, relationships).'],
+      ['p4', 'Notice one time you decided while tired, upset or rushed, and note what happened.'] ] },
+    { title: 'Week 2: Improve your inputs', items: [
+      ['p5', 'Run an outside-view check on one live decision: find three to five comparable cases and how they turned out.'],
+      ['p6', 'For one decision, list at least three options, including a small test version.'],
+      ['p7', 'Write one if-then plan for a habit or follow-through you keep dropping.'],
+      ['p8', 'Write the opportunity cost of one upcoming purchase or commitment.'] ] },
+    { title: 'Week 3: Stress-test', items: [
+      ['p9', 'Run a 10-minute pre-mortem on a decision you have not finalized.'],
+      ['p10', 'Write the strongest case against a belief or plan you are attached to.'],
+      ['p11', 'Apply the friend test to one personal dilemma, and act on the advice you would give.'],
+      ['p12', 'Add kill criteria and a review date to at least one ongoing commitment.'] ] },
+    { title: 'Week 4: Learn and lock in', items: [
+      ['p13', 'Review every journal entry that is due, separating process quality from luck.'],
+      ['p14', 'Read your calibration summary and note whether you lean overconfident or underconfident.'],
+      ['p15', 'Write a six to eight item personal checklist for one recurring high-stakes decision.'],
+      ['p16', 'Choose your default toolkit of three models and write the if-then plan that triggers each.'] ] }
+  ];
+  var total = plan.reduce(function (s, w) { return s + w.items.length; }, 0);
+
+  function updateProgress() {
+    var st = sget(KP, {});
+    var done = 0; Object.keys(st).forEach(function (k) { if (st[k]) done++; });
+    var pct = Math.round(done / total * 100);
+    $('#pfill').style.width = pct + '%';
+    $('#pbar').setAttribute('aria-valuenow', String(pct));
+    $('#ptext').textContent = done + ' of ' + total + ' steps done';
+  }
+  function renderPlan() {
+    var st = sget(KP, {});
+    var wrap = $('#weeks'); wrap.innerHTML = '';
+    plan.forEach(function (w) {
+      var sec = h('div', 'week'); sec.appendChild(h('h3', null, w.title));
+      var ul = document.createElement('ul');
+      w.items.forEach(function (it) {
+        var li = document.createElement('li');
+        var lab = document.createElement('label');
+        var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!st[it[0]];
+        cb.addEventListener('change', function () { var s2 = sget(KP, {}); s2[it[0]] = cb.checked; sset(KP, s2); updateProgress(); });
+        lab.appendChild(cb); lab.appendChild(h('span', null, it[1]));
+        li.appendChild(lab); ul.appendChild(li);
+      });
+      sec.appendChild(ul); wrap.appendChild(sec);
+    });
+    updateProgress();
+  }
+  $('#resetPlan').addEventListener('click', function () {
+    var b = $('#resetPlan');
+    if (b.getAttribute('data-armed') !== '1') { b.setAttribute('data-armed', '1'); b.textContent = 'Click again to reset'; return; }
+    b.removeAttribute('data-armed'); b.textContent = 'Reset plan progress';
+    sset(KP, {}); renderPlan();
+  });
+  renderPlan();
+
+  /* ---------- nav highlight ---------- */
+  var links = $$('.toc a');
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          links.forEach(function (a) { a.removeAttribute('aria-current'); });
+          var a = map[en.target.id]; if (a) a.setAttribute('aria-current', 'true');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    ['top', 'models', 'biases', 'protocol', 'journal', 'plan', 'caveats', 'sources'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) io.observe(el);
+    });
+  }
+})();
+</script>
+</body>
+</html>
